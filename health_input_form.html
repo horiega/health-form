@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健康データ入力</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#ffffff;
+  --bg-secondary:#f5f5f4;
+  --bg-success:#f0faf5;
+  --text-primary:#1a1a18;
+  --text-secondary:#5f5e5a;
+  --text-tertiary:#888780;
+  --text-success:#0f6e56;
+  --border-tertiary:rgba(0,0,0,0.12);
+  --border-secondary:rgba(0,0,0,0.22);
+  --border-primary:rgba(0,0,0,0.35);
+  --border-success:#1d9e75;
+  --radius-md:8px;
+  --radius-lg:12px;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue','Hiragino Sans',sans-serif;
+  --font-mono:'Menlo','Monaco','Courier New',monospace;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg-primary:#1e1e1c;
+    --bg-secondary:#2a2a27;
+    --bg-success:#04342c;
+    --text-primary:#f0ede6;
+    --text-secondary:#b4b2a9;
+    --text-tertiary:#888780;
+    --text-success:#5dcaa5;
+    --border-tertiary:rgba(255,255,255,0.1);
+    --border-secondary:rgba(255,255,255,0.18);
+    --border-primary:rgba(255,255,255,0.3);
+    --border-success:#1d9e75;
+  }
+}
+body{
+  font-family:var(--font-sans);
+  background:var(--bg-secondary);
+  min-height:100vh;
+  padding:2.5rem 1rem;
+  color:var(--text-primary);
+}
+.wrap{max-width:560px;margin:0 auto}
+.card{
+  background:var(--bg-primary);
+  border:0.5px solid var(--border-tertiary);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.tabs{
+  display:flex;
+  border-bottom:0.5px solid var(--border-tertiary);
+  background:var(--bg-secondary);
+}
+.tab{
+  flex:1;
+  padding:12px 0;
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  border:none;
+  background:none;
+  color:var(--text-secondary);
+  border-bottom:2px solid transparent;
+  margin-bottom:-0.5px;
+  transition:color .15s,border-color .15s;
+  letter-spacing:.01em;
+  font-family:var(--font-sans);
+}
+.tab.active{
+  color:var(--text-primary);
+  border-bottom-color:var(--text-primary);
+  background:var(--bg-primary);
+}
+.panel{display:none;padding:1.5rem}
+.panel.active{display:block}
+.drop-zone{
+  border:0.5px dashed var(--border-secondary);
+  border-radius:var(--radius-md);
+  padding:2.25rem 1rem;
+  text-align:center;
+  cursor:pointer;
+  transition:background .15s;
+  color:var(--text-tertiary);
+  font-size:13px;
+  margin-bottom:12px;
+}
+.drop-zone.drag,.drop-zone:hover{background:var(--bg-secondary)}
+.drop-icon{
+  width:32px;height:32px;
+  border:1.5px solid var(--border-secondary);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 10px;
+  color:var(--text-secondary);
+  font-size:15px;
+}
+.output-box{
+  width:100%;
+  min-height:90px;
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  background:var(--bg-secondary);
+  border:0.5px solid var(--border-tertiary);
+  border-radius:var(--radius-md);
+  padding:10px 12px;
+  color:var(--text-primary);
+  resize:vertical;
+  outline:none;
+  margin-top:10px;
+  line-height:1.6;
+}
+.output-box::placeholder{color:var(--text-tertiary)}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 14px;
+  font-size:12px;
+  cursor:pointer;
+  border:0.5px solid var(--border-secondary);
+  border-radius:var(--radius-md);
+  background:none;
+  color:var(--text-secondary);
+  margin-top:10px;
+  transition:background .15s;
+  font-family:var(--font-sans);
+}
+.btn:hover{background:var(--bg-secondary)}
+.btn:active{transform:scale(0.98)}
+.btn.ok{color:var(--text-success);border-color:var(--border-success)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field label{
+  display:block;
+  font-size:11px;
+  color:var(--text-secondary);
+  margin-bottom:5px;
+  letter-spacing:.02em;
+}
+.field input{
+  width:100%;
+  padding:7px 10px;
+  font-size:13px;
+  border:0.5px solid var(--border-tertiary);
+  border-radius:var(--radius-md);
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  outline:none;
+  font-family:var(--font-sans);
+  transition:border-color .15s;
+}
+.field input:focus{border-color:var(--border-primary)}
+.field input::placeholder{color:var(--text-tertiary)}
+.section-hint{
+  font-size:12px;
+  color:var(--text-tertiary);
+  margin-bottom:14px;
+}
+.status{
+  font-size:11.5px;
+  margin-top:6px;
+  min-height:16px;
+  color:var(--text-tertiary);
+}
+.status.ok{color:var(--text-success)}
+.divider{
+  height:0.5px;
+  background:var(--border-tertiary);
+  margin:14px 0;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+  <div class="tabs">
+    <button class="tab active" onclick="sw(0)">体重・歩数</button>
+    <button class="tab" onclick="sw(1)">検診</button>
+  </div>
+
+  <div id="p0" class="panel active">
+    <p class="section-hint">CSVファイルをドロップしてください</p>
+    <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()">
+      <div class="drop-icon">↓</div>
+      <div>CSVをここにドロップ、またはクリックして選択</div>
+      <input type="file" id="fi" accept=".csv" style="display:none" onchange="handleCSV(this.files[0])">
+    </div>
+    <div id="csv-status" class="status"></div>
+    <textarea id="tsv-out" class="output-box" readonly placeholder="出力はここに表示されます"></textarea>
+    <button class="btn" id="btn0" onclick="copyOut('tsv-out','btn0')">コピー</button>
+  </div>
+
+  <div id="p1" class="panel">
+    <div class="row" style="margin-bottom:14px">
+      <div class="field">
+        <label>記録日</label>
+        <input type="text" id="rec-date" />
+      </div>
+      <div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="row">
+      <div class="field"><label>クレアチニン</label><input type="number" step="0.01" id="cr" placeholder="0.00"/></div>
+      <div class="field"><label>eGFR</label><input type="number" step="0.1" id="egfr" placeholder="0.0"/></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>LDL-C</label><input type="number" step="1" id="ldl" placeholder="0"/></div>
+      <div class="field"><label>尿酸</label><input type="number" step="0.1" id="ua" placeholder="0.0"/></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>カリウム</label><input type="number" step="0.1" id="k" placeholder="0.0"/></div>
+      <div></div>
+    </div>
+    <button class="btn" onclick="genCheckup()">出力を生成</button>
+    <textarea id="ck-out" class="output-box" readonly placeholder="出力はここに表示されます"></textarea>
+    <button class="btn" id="btn1" onclick="copyOut('ck-out','btn1')">コピー</button>
+  </div>
+</div>
+</div>
+
+<script>
+function sw(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',i===j));
+}
+
+const dz=document.getElementById('dz');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('drag');
+  if(e.dataTransfer.files[0])handleCSV(e.dataTransfer.files[0]);
+});
+
+function handleCSV(file){
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    document.getElementById('tsv-out').value=processCSV(e.target.result);
+    const s=document.getElementById('csv-status');
+    s.textContent=file.name+' — 読み込み完了';
+    s.className='status ok';
+  };
+  r.readAsText(file,'UTF-8');
+}
+
+function parseCSVLine(line){
+  const cols=[];let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){inQ=!inQ}
+    else if(c===','&&!inQ){cols.push(cur);cur=''}
+    else{cur+=c}
+  }
+  cols.push(cur);return cols;
+}
+
+function isHeader(line){
+  return /日付[\/／]時間|ステップカウント|step\s*count/i.test(line);
+}
+
+function processCSV(csv){
+  return csv.split('\n')
+    .filter(l=>l.trim()!==''&&!isHeader(l))
+    .map(line=>{
+      return parseCSVLine(line).map(val=>{
+        val=val.trim();
+        if(/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}\s+\d/.test(val))
+          val=val.replace(/\s+\d{1,2}:\d{2}:\d{2}$/,'').trim();
+        return val;
+      }).join('\t');
+    }).join('\n');
+}
+
+(function(){
+  const d=new Date();
+  document.getElementById('rec-date').value=
+    d.getFullYear()+'/'
+    +(d.getMonth()+1).toString().padStart(2,'0')+'/'
+    +d.getDate().toString().padStart(2,'0');
+})();
+
+function genCheckup(){
+  const row=[
+    document.getElementById('rec-date').value,
+    document.getElementById('cr').value,
+    document.getElementById('egfr').value,
+    document.getElementById('ldl').value,
+    document.getElementById('ua').value,
+    document.getElementById('k').value
+  ].join('\t');
+  document.getElementById('ck-out').value=row;
+}
+
+function copyOut(id,btnId){
+  const val=document.getElementById(id).value;
+  if(!val.trim())return;
+  navigator.clipboard.writeText(val).then(()=>{
+    const btn=document.getElementById(btnId);
+    const orig=btn.textContent;
+    btn.textContent='コピーしました ✓';
+    btn.className='btn ok';
+    setTimeout(()=>{btn.textContent=orig;btn.className='btn'},1800);
+  });
+}
+</script>
+</body>
+</html>
